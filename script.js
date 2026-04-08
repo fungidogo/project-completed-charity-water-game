@@ -7,6 +7,7 @@ let session;
 let clearCanInterval;
 const timerElement = document.getElementById("timer");
 const cansElement = document.getElementById("current-cans");
+const goalCansElement=document.getElementById("goal-cans");
 const easymode = document.getElementById("Easy");
 const mediummode = document.getElementById("Medium");
 const hardmode = document.getElementById("Hard");
@@ -58,7 +59,6 @@ function spawnWaterCan() {
 
 function gainCan(i){
       if(!gameActive)return;
-      console.log(i.target.parentNode);
       if(i.target.className==="water-can")
       {
         i.target.parentNode.parentNode.innerHTML='';
@@ -73,14 +73,17 @@ function gainCan(i){
       
       clearInterval(spawnInterval);
       spawnInterval=setInterval(spawnWaterCan,speed);
-      
-      
+      if(currentCans>=GOAL_CANS)
+      {
+        endGame();
+        document.querySelectorAll('.grid-cell').forEach(cell => (cell.innerHTML=''));
+      }
 }
 
 function countDown(){
   timer--;
   timerElement.textContent=timer;
-  if(timer<=0||currentCans>GOAL_CANS)
+  if(timer<=0||currentCans>=GOAL_CANS)
   {
     endGame();
     document.querySelectorAll('.grid-cell').forEach(cell => (cell.innerHTML=''));
@@ -90,32 +93,34 @@ function countDown(){
 function easyMode(){
   if(gameActive)return;
   GOAL_CANS=easy.GOAL_CANS;
+  goalCansElement.textContent=GOAL_CANS;
   timer=easy.timer;
   speed=easy.speed;
   easy.selected=true;
   timerElement.textContent=timer;
-  console.log("easy");
-  console.log(easy.timer);
+  
 }
 
 function mediumMode(){
   if(gameActive)return;
   GOAL_CANS=medium.GOAL_CANS;
+  goalCansElement.textContent=GOAL_CANS;
   timer=medium.timer;
   speed=medium.speed;
   medium.selected=true;
   timerElement.textContent=timer;
-  console.log("medium");
+  
 }
 
 function hardMode(){
   if(gameActive)return;
   GOAL_CANS=hard.GOAL_CANS;
+  goalCansElement.textContent=GOAL_CANS;
   timer=hard.timer;
   speed=hard.speed;
   hard.selected=true;
   timerElement.textContent=timer;
-  console.log("hard");
+  
 }
 
 // Initializes and starts a new game
