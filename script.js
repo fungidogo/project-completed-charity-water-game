@@ -1,5 +1,5 @@
 // Game configuration and state variables
-const GOAL_CANS = 20;        // Total items needed to collect
+let GOAL_CANS;        // Total items needed to collect
 let currentCans = 0;         // Current number of items collected
 let gameActive = false;      // Tracks if game is currently running
 let spawnInterval;   // Holds the interval for spawning items
@@ -7,11 +7,20 @@ let session;
 let clearCanInterval;
 const timerElement = document.getElementById("timer");
 const cansElement = document.getElementById("current-cans");
+const easymode = document.getElementById("Easy");
+const mediummode = document.getElementById("Medium");
+const hardmode = document.getElementById("Hard");
 let waterCan;
 let latestCan;
 let timer = 30;
 let speed = 1000;
-let array=[];
+const easy ={GOAL_CANS:20,timer:50,speed:1000,selected:false};
+const medium ={GOAL_CANS:30,timer:40,speed:750,selected:false};
+const hard ={GOAL_CANS:40,timer:30,speed:500,selected:false};
+
+  if(!easy.selected){easymode.addEventListener('click',easyMode);}
+  if(!medium.selected){mediummode.addEventListener('click',mediumMode);}
+  if(!hard.selected){hardmode.addEventListener('click',hardMode);}
 
 const gamebutton = document.getElementById('start-game');
 gamebutton.addEventListener('click', startGame);
@@ -38,9 +47,7 @@ function spawnWaterCan() {
   // Stop if the game is not active
   const cells = document.querySelectorAll('.grid-cell');
   let randomCell = cells[Math.floor(Math.random() * cells.length)];
-  let randomCellId=document.getElementById(randomCell.id);
-  array.unshift(randomCellId);
-  if(randomCell.innerHTML==""){
+  if(randomCell.innerHTML===''){
     randomCell.innerHTML = `
     <div class="water-can-wrapper" id="wrapper">
       <div class="water-can"></div>
@@ -49,53 +56,97 @@ function spawnWaterCan() {
   }
 }
 
-function gainCan(){
-      if(array.length<1) return;
+function gainCan(i){
+      if(!gameActive)return;
+      console.log(i.target.parentNode);
+      if(i.target.className==="water-can")
+      {
+        i.target.parentNode.parentNode.innerHTML='';
+      }
+      else
+      {
+        return;
+      }
       currentCans++;
       cansElement.textContent=currentCans;
-      clearCans();
-
-      speed-=10;
+      speed-=25;
+      
       clearInterval(spawnInterval);
       spawnInterval=setInterval(spawnWaterCan,speed);
+      
+      
 }
 
 function countDown(){
   timer--;
   timerElement.textContent=timer;
-  if(timer<=0||currentCans>25)
+  if(timer<=0||currentCans>GOAL_CANS)
   {
     endGame();
     document.querySelectorAll('.grid-cell').forEach(cell => (cell.innerHTML=''));
   }
-  
+}
+
+function easyMode(){
+  if(gameActive)return;
+  GOAL_CANS=easy.GOAL_CANS;
+  timer=easy.timer;
+  speed=easy.speed;
+  easy.selected=true;
+  timerElement.textContent=timer;
+  console.log("easy");
+  console.log(easy.timer);
+}
+
+function mediumMode(){
+  if(gameActive)return;
+  GOAL_CANS=medium.GOAL_CANS;
+  timer=medium.timer;
+  speed=medium.speed;
+  medium.selected=true;
+  timerElement.textContent=timer;
+  console.log("medium");
+}
+
+function hardMode(){
+  if(gameActive)return;
+  GOAL_CANS=hard.GOAL_CANS;
+  timer=hard.timer;
+  speed=hard.speed;
+  hard.selected=true;
+  timerElement.textContent=timer;
+  console.log("hard");
 }
 
 // Initializes and starts a new game
 function startGame() {
   if (gameActive) return; // Prevent starting a new game if one is already active
   gameActive = true;
+  if(!easy.selected&&!medium.selected&&!hard.selected)
+  {
+    easyMode();
+  }
   startGame.textContent="Reset";
-  timer=30;
   currentCans=0;
-  speed=1000;
   cansElement.textContent=currentCans;
-  createGrid(); // Set up the game grid
+  createGrid();
   spawnInterval = setInterval(spawnWaterCan, speed); // Spawn water cans every second
   session = setInterval(countDown,1000);
-  //clearCanInterval= setInterval(clearCans,3000);
 }
 
-function clearCans(){
-  array[array.length-1].innerHTML='';
-  array.pop();
+function clearCans(i){
+  i.innerHTML='';
 }
 
 function endGame() {
   gameActive = false; // Mark the game as inactive
+  easy.selected=false;
+  medium.selected=false;
+  hard.selected=false;
   clearInterval(spawnInterval); // Stop spawning water cans
   clearInterval(session);
 }
+
 
 // Set up click handler for the start button
 
