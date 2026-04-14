@@ -81,10 +81,8 @@ h1 img {
 .difficulty{
   display: flex;
   justify-content: center;
-  align-items: center;
-  width:20px;
-  gap:10px;
-  margin-left:325px;
+  
+  row-gap:0;
   margin-bottom: 10px;
   margin-top: 0;
 }
@@ -189,5 +187,11 @@ footer{
 
   .game-instructions{
     font-size:15px;
+  }
+  
+  .difficulty{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
   }
 }
